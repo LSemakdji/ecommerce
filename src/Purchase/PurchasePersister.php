@@ -15,35 +15,32 @@ class PurchasePersister
     protected $cartService;
     protected $em;
 
-    public function __construct(Security $security, CartService $cartService, EntityManagerInterface $em){
+    public function __construct(Security $security, CartService $cartService, EntityManagerInterface $em)
+    {
         $this->security = $security;
         $this->cartService = $cartService;
         $this->em = $em;
-
     }
-    public function storePurchase(Purchase $purchase){
+    public function storePurchase(Purchase $purchase)
+    {
 
-        $purchase->setUser($this->security->getUser())
-            ->setPurchasedAt(new DateTime())
-            ->setTotal($this->cartService->getTotal());
+        $purchase->setUser($this->security->getUser());
 
-            $this->em->persist($purchase);
+        $this->em->persist($purchase);
 
-    foreach ($this->cartService->getDetailedCartItems() as $cartItem) {
-        $purchaseItem = new PurchaseItem;
+        foreach ($this->cartService->getDetailedCartItems() as $cartItem) {
+            $purchaseItem = new PurchaseItem;
 
-        $purchaseItem->setPurchase($purchase)
-                    ->setProduct($cartItem->product)
-                    ->setProductName($cartItem->product->getName())
-                    ->setQuantity($cartItem->qty)
-                    ->setTotal($cartItem->getTotal())
-                    ->setProductPrice($cartItem->product->getPrice());
+            $purchaseItem
+                ->setProduct($cartItem->product)
+                ->setProductName($cartItem->product->getName())
+                ->setQuantity($cartItem->qty)
+                ->setTotal($cartItem->getTotal())
+                ->setProductPrice($cartItem->product->getPrice());
 
-                    $this->em->persist($purchaseItem);
+
+            $this->em->persist($purchaseItem);
+        }
+        $this->em->flush();
     }
-                    $this->em->flush();
-
-    }
-
-
 }
