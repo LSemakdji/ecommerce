@@ -6,64 +6,70 @@ use App\Cart\CartItem;
 use App\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class CartService{
+class CartService
+{
     protected $session;
     protected $productRepository;
-    
-    public function __construct(SessionInterface $session,ProductRepository $productRepository)
+
+    public function __construct(SessionInterface $session, ProductRepository $productRepository)
     {
-        $this->session= $session;
+        $this->session = $session;
         $this->productRepository = $productRepository;
     }
 
-    protected function getCart():array{
-        return $this->session->get('cart',[]);
+    protected function getCart(): array
+    {
+        return $this->session->get('cart', []);
     }
 
-    protected function saveCart(array $cart){
+    protected function saveCart(array $cart)
+    {
 
-        $this->session->set('cart',$cart);        
+        $this->session->set('cart', $cart);
     }
-    public function empty(){
+
+    public function empty()
+    {
         $this->saveCart([]);
     }
 
-    public function add(int $id){
+    public function add(int $id)
+    {
 
         $cart = $this->getCart();
 
         if (!array_key_exists($id, $cart)) {
-            $cart[$id]=0;
+            $cart[$id] = 0;
         }
         $cart[$id]++;
-        
+
         $this->saveCart($cart);
-    
     }
 
-    public function remove(int $id){
+    public function remove(int $id)
+    {
 
-        $cart= $this->getCart();
+        $cart = $this->getCart();
 
         unset($cart[$id]);
 
         $this->saveCart($cart);
-
     }
 
 
-    public function getTotal():int{
+    public function getTotal(): int
+    {
 
         $total = 0;
 
         foreach ($this->getCart() as $id => $qty) {
             $product = $this->productRepository->find($id);
-            
+
             if (!$product) {
-             continue;
+                continue;
             }
 
-        $total += $product->getPrice() * $qty;
+            $total += $product->getPrice() * $qty;
         }
 
         return $total;
@@ -72,26 +78,27 @@ class CartService{
      *
      * @return CartItem[]
      */
-    public function getDetailedCartItems(): array {
+    public function getDetailedCartItems(): array
+    {
 
-        $detailedCart=[];
-        
+        $detailedCart = [];
+
         foreach ($this->getCart() as $id => $qty) {
 
             $product = $this->productRepository->find($id);
 
-                if (!$product) {
-                    continue;
-                }
+            if (!$product) {
+                continue;
+            }
 
-            $detailedCart[] = new CartItem($product,$qty);
-
+            $detailedCart[] = new CartItem($product, $qty);
         }
         return $detailedCart;
     }
 
-    public function decrement(int $id){
-        
+    public function decrement(int $id)
+    {
+
         $cart = $this->getCart();
 
         if (!array_key_exists($id, $cart)) {
@@ -102,7 +109,7 @@ class CartService{
             return;
         }
         $cart[$id]--;
-        
+
         $this->saveCart($cart);
     }
 }

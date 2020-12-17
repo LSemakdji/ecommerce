@@ -5,6 +5,8 @@ namespace App\Entity;
 use DateTime;
 use App\Entity\PurchaseItem;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\PreFlush;
+use Doctrine\ORM\Mapping\PrePersist;
 use App\Repository\PurchaseRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
@@ -91,6 +93,7 @@ class Purchase
         foreach ($this->purchaseItems as $item) {
             $total += $item->getTotal();
         }
+        $this->total = $total;
     }
 
     public function __construct()

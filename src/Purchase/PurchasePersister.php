@@ -3,7 +3,6 @@
 namespace App\Purchase;
 
 use App\Cart\CartService;
-use DateTime;
 use App\Entity\Purchase;
 use App\Entity\PurchaseItem;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,9 +28,10 @@ class PurchasePersister
         $this->em->persist($purchase);
 
         foreach ($this->cartService->getDetailedCartItems() as $cartItem) {
+
             $purchaseItem = new PurchaseItem;
 
-            $purchaseItem
+            $purchaseItem->setPurchase($purchase)
                 ->setProduct($cartItem->product)
                 ->setProductName($cartItem->product->getName())
                 ->setQuantity($cartItem->qty)
